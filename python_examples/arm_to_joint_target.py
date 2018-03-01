@@ -12,20 +12,22 @@ env = openravepy.Environment()
 env.StopSimulation()
 env.Load("robots/pr2-beta-static.zae")
 env.Load("../data/table.xml")
+#env.Load("../../optplanners_ws/src/OptPlanners_OpenRAVE/scripts/data/envs/ur5_hook.env.xml")
 
 trajoptpy.SetInteractive(args.interactive) # pause every iteration, until you press 'p'. Press escape to disable further plotting
 robot = env.GetRobots()[0]
 
 joint_start = [-1.832, -0.332, -1.011, -1.437, -1.1  , -1.926,  3.074]
-robot.SetDOFValues(joint_start, robot.GetManipulator('rightarm').GetArmIndices())
+#joint_start = [0.0, 0.0, 0.0, -1.59, 0.0, 0.0]
+robot.SetDOFValues(joint_start, robot.GetManipulator('arm').GetArmIndices())
 
 joint_target = [0.062, 1.287, 0.1, -1.554, -3.011, -0.268, 2.988]
-
+#joint_target = [0.42126598, 0.91445, 1.08695097, 2.7366385, -1.55, 0.00293]
 
 request = {
   "basic_info" : {
-    "n_steps" : 10,
-    "manip" : "rightarm", # see below for valid values
+    "n_steps" : 50,
+    "manip" : "arm", # see below for valid values
     "start_fixed" : True # i.e., DOF values at first timestep are fixed based on current robot state
   },
   "costs" : [
@@ -38,7 +40,8 @@ request = {
     "type" : "collision",
     "params" : {
       "coeffs" : [20], # penalty coefficients. list of length one is automatically expanded to a list of length n_timesteps
-      "dist_pen" : [0.025] # robot-obstacle distance that penalty kicks in. expands to length n_timesteps
+      "dist_pen" : [0.025], # robot-obstacle distance that penalty kicks in. expands to length n_timesteps
+      "continuous": False # discrete collisions, not continuous
     },    
   }
   ],
