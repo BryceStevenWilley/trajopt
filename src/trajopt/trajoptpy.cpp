@@ -16,8 +16,6 @@ namespace py = boost::python;
 bool gInteractive = false;
 py::object openravepy;
 
-
-
 EnvironmentBasePtr GetCppEnv(py::object py_env) {
   py::object openravepy = py::import("openravepy");
   int id = py::extract<int>(openravepy.attr("RaveGetEnvironmentId")(py_env));
@@ -33,9 +31,6 @@ KinBody::LinkPtr GetCppLink(py::object py_link, EnvironmentBasePtr env) {
   int idx = py::extract<int>(py_link.attr("GetIndex")());
   return parent->GetLinks()[idx];
 }
-
-
-
 
 class PyTrajOptProb {
 public:

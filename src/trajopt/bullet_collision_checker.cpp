@@ -236,7 +236,7 @@ COWPtr CollisionObjectFromLink(OR::KinBody::LinkPtr link, bool useTrimesh) {
     compound->setMargin(MARGIN); //margin: compound. seems to have no effect when positive but has an effect when negative
     cow->setCollisionShape(compound);
 
-    BOOST_FOREACH(const boost::shared_ptr<OpenRAVE::KinBody::Link::Geometry>& geom, geometries) {
+    for (const boost::shared_ptr<OpenRAVE::KinBody::Link::Geometry>& geom : geometries) {
 
       btCollisionShape* subshape = createShapePrimitive(geom, useTrimesh, cow.get());
       if (subshape != NULL) {
@@ -540,8 +540,8 @@ void BulletCollisionChecker::AddKinBody(const OR::KinBodyPtr& body) {
 
   trajopt::SetUserData(*body, "bt", cd);
   
-  bool useTrimesh = trajopt::GetUserData(*body, "bt_use_trimesh");
-  BOOST_FOREACH(const OR::KinBody::LinkPtr& link, links) {
+  bool useTrimesh = (bool) trajopt::GetUserData(*body, "bt_use_trimesh");
+  for (const OR::KinBody::LinkPtr& link : links) {
     if (link->GetGeometries().size() > 0) {
       COWPtr new_cow = CollisionObjectFromLink(link, useTrimesh); 
       if (new_cow) {
@@ -561,7 +561,7 @@ void BulletCollisionChecker::AddKinBody(const OR::KinBodyPtr& body) {
 }
 void BulletCollisionChecker::RemoveKinBody(const OR::KinBodyPtr& body) {
   LOG_DEBUG("removing %s", body->GetName().c_str());
-  BOOST_FOREACH(const OR::KinBody::LinkPtr& link, body->GetLinks()) {
+  for (const OR::KinBody::LinkPtr& link : body->GetLinks()) {
     CollisionObjectWrapper* cow = GetCow(link.get());
     if (cow) {
       m_world->removeCollisionObject(cow);
@@ -576,16 +576,16 @@ void SetDifferences(const vector<T>& A, const vector<T>& B, vector<T>& AMinusB, 
   set<T> Aset, Bset;
   AMinusB.clear();
   BMinusA.clear();
-  BOOST_FOREACH(const T& a, A) {
+  for (const T& a : A) {
     Aset.insert(a);
   }
-  BOOST_FOREACH(const T& b, B) {
+  for (const T& b : B) {
     Bset.insert(b);
   }
-  BOOST_FOREACH(const T& a, A) {
+  for (const T& a : A) {
     if (Bset.count(a) == 0) AMinusB.push_back(a);
   }
-  BOOST_FOREACH(const T& b, B) {
+  for (const T& b : B) {
     if (Aset.count(b) == 0) BMinusA.push_back(b);
   }
 }
@@ -593,11 +593,11 @@ void SetDifferences(const vector<T>& A, const vector<T>& B, vector<T>& AMinusB, 
 void BulletCollisionChecker::AddAndRemoveBodies(const vector<KinBodyPtr>& curVec, const vector<KinBodyPtr>& prevVec, vector<KinBodyPtr>& toAdd) {
   vector<KinBodyPtr> toRemove;
   SetDifferences(curVec, prevVec, toAdd, toRemove);
-  BOOST_FOREACH(const KinBodyPtr& body, toAdd) {
+  for (const KinBodyPtr& body : toAdd) {
     assert(!trajopt::GetUserData(*body, "bt"));
     AddKinBody(body);
   }
-  BOOST_FOREACH(const KinBodyPtr& body, toRemove) {
+  for (const KinBodyPtr& body : toRemove) {
     RemoveKinBody(body);
   }
   SetLinkIndices();
@@ -614,7 +614,7 @@ void BulletCollisionChecker::SetLinkIndices() {
 }
 
 void BulletCollisionChecker::UpdateAllowedCollisionMatrix() {
-  BOOST_FOREACH(const LinkPair& pair, m_excludedPairs) {
+  for (const LinkPair& pair : m_excludedPairs) {
     const KinBody::Link* linkA = pair.first;
     const KinBody::Link* linkB = pair.second;
     const CollisionObjectWrapper* cowA = GetCow(linkA);
@@ -635,7 +635,7 @@ void BulletCollisionChecker::UpdateBulletFromRave() {
     m_prevbodies=bodies;
     float contactDistanceOld = GetContactDistance();
     SetContactDistance(.1 METERS);
-    BOOST_FOREACH(const KinBodyPtr& body, addedBodies) {
+    for (const KinBodyPtr& body : addedBodies) {
       IgnoreZeroStateSelfCollisions(body);
     }
     SetContactDistance(contactDistanceOld);
@@ -678,7 +678,7 @@ vector<btTransform> rightMultiplyAll(const vector<btTransform>& xs, const btTran
 }
 
 
-}
+} // no namespace.
 
 void ContinuousCheckShape(btCollisionShape* shape, const vector<btTransform>& transforms,
     KinBody::Link* link, btCollisionWorld* world, vector<Collision>& collisions) {
@@ -719,7 +719,7 @@ void BulletCollisionChecker::ContinuousCheckTrajectory(const TrajArray& traj, Co
   // against KinBodyFilter stuff
   // remove them, because we can't check moving stuff against each other
   vector<CollisionObjectWrapper*> cows;
-  BOOST_FOREACH(KinBody::LinkPtr& link, links) {
+  for (KinBody::LinkPtr& link : links) {
     CollisionObjectWrapper* cow = GetCow(link.get());
     assert(cow != NULL);
     cows.push_back(cow);
@@ -743,75 +743,7 @@ void BulletCollisionChecker::ContinuousCheckTrajectory(const TrajArray& traj, Co
   for (int iLink = 0; iLink < links.size(); ++iLink) {
     ContinuousCheckShape(cows[iLink]->getCollisionShape(), link2transforms[iLink], links[iLink].get(), m_world, collisions);
   }
-
-#if 0
-  // add them back
-  BOOST_FOREACH(CollisionObjectWrapper* cow, cows) {
-    m_world->addCollisionObject(cow);
-  }
-#endif
 }
-
-#if 0
-class CompoundHullShape : public btConvexShape {
-  std::vector<btConvexHullShape*> m_children;
-  btVector3   localGetSupportingVertex(const btVector3& vec)const {
-    btVector3 sv = m_children[0]->localGetSupportingVertex(vec);
-    float support = sv.dot(vec);
-    for (int i=1; i < m_children.size(); ++i) {
-      btVector3 newsv = m_children[i]->localGetSupportingVertex(vec);
-      float newsupport = vec.dot(newsv);
-      if (newsupport > support) {
-        support = newsupport;
-        sv = newsv;
-      }
-    }
-  }
-#if 0
-  void project(const btTransform& trans, const btVector3& dir, btScalar& min, btScalar& max) const {
-    m_children[0]->project(trans, dir, min, max);
-    for (int i=1; i < m_children.size(); ++i) {
-      btScalar newmin, newmax;
-      m_children[i]->project(trans, dir, newmin, newmax);
-      btSetMin(min, newmin);
-      btSetMax(max, newmax);
-    }
-  }
-#endif
-
-  //notice that the vectors should be unit length
-  void    batchedUnitVectorGetSupportingVertexWithoutMargin(const btVector3* vectors,btVector3* supportVerticesOut,int numVectors) const {
-    throw std::runtime_error("not implemented");
-  }
-
-  ///getAabb's default implementation is brute force, expected derived classes to implement a fast dedicated version
-  void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const {
-    m_children[0]->getAabb(t, aabbMin, aabbMax);
-    for (int i=1; i < m_children.size(); ++i) {
-      btVector3 newmin, newmax;
-      m_children[i]->getAabb(t, newmin, newmax);
-      aabbMin.setMin(newmin);
-      aabbMax.setMax(newmax);
-    }
-  }
-
-  virtual void getAabbSlow(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const {
-    throw std::runtime_error("shouldn't happen");
-  }
-
-  virtual void    setLocalScaling(const btVector3& scaling) {}
-  virtual const btVector3& getLocalScaling() const {return btVector3(1,1,1);}
-
-  virtual void    setMargin(btScalar margin) {}
-  virtual btScalar    getMargin() const {return 0;}
-
-  virtual int     getNumPreferredPenetrationDirections() const {return 0;}
-  virtual void    getPreferredPenetrationDirection(int index, btVector3& penetrationVector) const=0;
-
-
-};
-#endif
-
 
 struct CastHullShape : public btConvexShape {
 public:
@@ -828,17 +760,6 @@ public:
     btVector3 sv1 = m_t01*m_shape->localGetSupportingVertex(vec*m_t01.getBasis());
     return (vec.dot(sv0) > vec.dot(sv1)) ? sv0 : sv1;
   }
-#if 0
-  void project(const btTransform& trans, const btVector3& dir, btScalar& min, btScalar& max) const {
-    m_children[0]->project(trans, dir, min, max);
-    for (int i=1; i < m_children.size(); ++i) {
-      btScalar newmin, newmax;
-      m_children[i]->project(trans, dir, newmin, newmax);
-      btSetMin(min, newmin);
-      btSetMax(max, newmax);
-    }
-  }
-#endif
 
   //notice that the vectors should be unit length
   void    batchedUnitVectorGetSupportingVertexWithoutMargin(const btVector3* vectors,btVector3* supportVerticesOut,int numVectors) const {
@@ -929,13 +850,9 @@ btScalar CastCollisionCollector::addSingleResult(btManifoldPoint& cp,
         GetAverageSupport(shape->m_shape, normalLocal1, localsup1, ptLocal1);
         btVector3 ptWorld1 = tfWorld1 * ptLocal1;
 
-
-
 #endif
         float sup0 = normalWorldFromCast.dot(ptWorld0);
         float sup1 = normalWorldFromCast.dot(ptWorld1);
-
-
 
         // TODO: this section is potentially problematic. think hard about the math
         if (sup0 - sup1 > SUPPORT_FUNC_TOLERANCE) {
@@ -1022,19 +939,12 @@ void BulletCollisionChecker::CastVsAll(Configuration& rad, const vector<KinBody:
   LOG_DEBUG("CastVsAll checked %li links and found %li collisions", links.size(), collisions.size());
 }
 
-}
-
-
-
-
-
+} // no namespace
 
 namespace trajopt {
-
-
 
 CollisionCheckerPtr CreateCollisionChecker(OR::EnvironmentBaseConstPtr env) {
   CollisionCheckerPtr checker(new BulletCollisionChecker(env));
   return checker;
 }
-}
+} // namespace trajopt

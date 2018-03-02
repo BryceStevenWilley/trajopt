@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(trajopt)
 
+add_compile_options(-std=c++11)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 option(DEVEL_MODE "build with compiler more errors" OFF)

@@ -1,17 +1,10 @@
 #include "trajopt/collision_checker.hpp"
 #include "trajopt/rave_utils.hpp"
-#include <boost/foreach.hpp>
 #include "utils/eigen_conversions.hpp"
 #include "utils/logging.hpp"
 using namespace OpenRAVE;
 
 namespace trajopt {
-
-#if 0
-void CollisionPairIgnorer::AddExcludes(const CollisionPairIgnorer& other) {
-  m_pairs.insert(other.m_pairs.begin(), other.m_pairs.end());
-}
-#endif
 
 boost::shared_ptr<CollisionChecker> CollisionChecker::GetOrCreate(OR::EnvironmentBase& env) {
   UserDataPtr ud = GetUserData(env, "trajopt_cc");
@@ -26,24 +19,11 @@ boost::shared_ptr<CollisionChecker> CollisionChecker::GetOrCreate(OR::Environmen
   return boost::dynamic_pointer_cast<CollisionChecker>(ud);
 }
 
-
-#if 0
-void CollisionPairIgnorer::ExcludePair(const KinBody::Link& link1, const KinBody::Link& link2) {
-
-  m_pairs.insert(LinkPair(&link1, &link2));
-  m_pairs.insert(LinkPair(&link2, &link1));
-}
-bool CollisionPairIgnorer::CanCollide(const KinBody::Link& link1, const KinBody::Link& link2) const {
-  return m_pairs.find(LinkPair(&link1, &link2)) == m_pairs.end();
-}
-#endif
-
 void CollisionChecker::IgnoreZeroStateSelfCollisions(OpenRAVE::KinBodyPtr body) {
   LOG_DEBUG("IgnoreZeroStateSelfCollisions for %s", body->GetName().c_str());
   KinBody::KinBodyStateSaver saver(body);
   body->SetDOFValues(DblVec(body->GetDOF(), 0));
   body->SetTransform(Transform(Vector(1,0,0,0), (Vector(0,0,10))));
-
 
   vector<Collision> collisions;
   BodyVsAll(*body,  collisions);
@@ -56,11 +36,10 @@ void CollisionChecker::IgnoreZeroStateSelfCollisions(OpenRAVE::KinBodyPtr body) 
 }
 
 void CollisionChecker::IgnoreZeroStateSelfCollisions() {
-
   vector<KinBodyPtr> bodies;
   GetEnv()->GetBodies(bodies);
 
-  BOOST_FOREACH(const KinBodyPtr& body, bodies) {
+  for (const KinBodyPtr& body : bodies) {
     IgnoreZeroStateSelfCollisions(body);
   }
 }
@@ -76,5 +55,4 @@ std::ostream& operator<<(std::ostream& o, const Collision& c) {
   return o;
 }
 
-
-}
+} // namespace trajopt

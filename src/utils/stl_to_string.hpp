@@ -5,14 +5,11 @@
 #include <sstream>
 #include <map>
 #include <set>
+
 namespace util {
 
 using std::string;
 using std::vector;
-
-//std::string Str(const vector<double>& x);
-//std::string Str(const vector<float>& x);
-//std::string Str(const vector<int>& x);
 
 template<class T>
 std::string Str(const vector<T>& x) {
@@ -64,9 +61,6 @@ std::string Str(const typename std::map<K,V>& x) {
   ss << "}";
   return ss.str();
 }
-
-
-
 
 }
 

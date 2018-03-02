@@ -153,6 +153,4 @@ DblVec RobotAndDOF::RandomDOFValues() {
   return out;
 }
 
-
-
 }

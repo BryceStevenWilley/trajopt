@@ -19,7 +19,7 @@ robot = env.GetRobots()[0]
 
 joint_start = [-1.832, -0.332, -1.011, -1.437, -1.1  , -1.926,  3.074]
 #joint_start = [0.0, 0.0, 0.0, -1.59, 0.0, 0.0]
-robot.SetDOFValues(joint_start, robot.GetManipulator('arm').GetArmIndices())
+robot.SetDOFValues(joint_start, robot.GetManipulator('rightarm').GetArmIndices())
 
 joint_target = [0.062, 1.287, 0.1, -1.554, -3.011, -0.268, 2.988]
 #joint_target = [0.42126598, 0.91445, 1.08695097, 2.7366385, -1.55, 0.00293]

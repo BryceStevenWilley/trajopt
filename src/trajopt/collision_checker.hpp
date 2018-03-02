@@ -24,7 +24,9 @@ struct Collision {
   double distance; /* pt1 = pt2 + normal*dist */
   float weight, time;
   CastCollisionType cctype;
-  Collision(const KinBody::Link* linkA, const KinBody::Link* linkB, const OR::Vector& ptA, const OR::Vector& ptB, const OR::Vector& normalB2A, double distance, float weight=1, float time=0) :
+  Collision(const KinBody::Link* linkA, const KinBody::Link* linkB, 
+            const OR::Vector& ptA, const OR::Vector& ptB, 
+            const OR::Vector& normalB2A, double distance, float weight=1, float time=0) :
     linkA(linkA), linkB(linkB), ptA(ptA), ptB(ptB), normalB2A(normalB2A), distance(distance), weight(weight), time(0), cctype(CCType_None) {}
 };
 TRAJOPT_API std::ostream& operator<<(std::ostream&, const Collision&);
@@ -35,8 +37,7 @@ enum CollisionFilterGroups {
 };
 
 /** 
-Each CollisionChecker object has a copy of the world, so for performance, don't make too many copies  
-*/ 
+ * Each CollisionChecker object has a copy of the world. For performance, don't make too many copies. */ 
 class TRAJOPT_API CollisionChecker : public OR::UserData {
 public:
 
@@ -88,5 +89,5 @@ CollisionCheckerPtr TRAJOPT_API CreateCollisionChecker(OR::EnvironmentBaseConstP
 
 TRAJOPT_API void PlotCollisions(const std::vector<Collision>& collisions, OR::EnvironmentBase& env, vector<OR::GraphHandlePtr>& handles, double safe_dist);
 
-}
+} // namespace trajopt
 

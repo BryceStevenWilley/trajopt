@@ -5,7 +5,6 @@
 #include "sco/expr_vec_ops.hpp"
 #include "sco/expr_ops.hpp"
 #include "sco/sco_common.hpp"
-#include <boost/foreach.hpp>
 #include "utils/eigen_conversions.hpp"
 #include "sco/modeling_utils.hpp"
 #include "utils/stl_to_string.hpp"
@@ -25,7 +24,7 @@ void CollisionsToDistances(const vector<Collision>& collisions, const Link2Int& 
   // since we're using LinksVsAll
   dists.clear();
   dists.reserve(collisions.size());
-  BOOST_FOREACH(const Collision& col, collisions) {
+  for (const Collision& col : collisions) {
     Link2Int::const_iterator itA = m_link2ind.find(col.linkA);
     Link2Int::const_iterator itB = m_link2ind.find(col.linkB);
     if (itA != m_link2ind.end() || itB != m_link2ind.end()) {
@@ -40,7 +39,7 @@ void CollisionsToDistanceExpressions(const vector<Collision>& collisions, Config
   exprs.clear();
   exprs.reserve(collisions.size());
   rad.SetDOFValues(dofvals); // since we'll be calculating jacobians
-  BOOST_FOREACH(const Collision& col, collisions) {
+  for (const Collision& col : collisions) {
     AffExpr dist(col.distance);
     Link2Int::const_iterator itA = link2ind.find(col.linkA);
     if (itA != link2ind.end()) {
@@ -105,7 +104,6 @@ SingleTimestepCollisionEvaluator::SingleTimestepCollisionEvaluator(Configuration
   m_link2ind(),
   m_links(),
   m_filterMask(-1) {
-  vector<KinBody::LinkPtr> links;
   vector<int> inds;
   rad->GetAffectedLinks(m_links, true, inds);
   for (int i=0; i < m_links.size(); ++i) {
@@ -180,7 +178,7 @@ void CastCollisionEvaluator::CalcDists(const DblVec& x, DblVec& dists) {
 typedef OpenRAVE::RaveVector<float> RaveVectorf;
 
 void PlotCollisions(const std::vector<Collision>& collisions, OR::EnvironmentBase& env, vector<OR::GraphHandlePtr>& handles, double safe_dist) {
-  BOOST_FOREACH(const Collision& col, collisions) {
+  for (const Collision& col : collisions) {
     RaveVectorf color;
     if (col.distance < 0) color = RaveVectorf(1,0,0,1);
     else if (col.distance < safe_dist) color = RaveVectorf(1,1,0,1);
