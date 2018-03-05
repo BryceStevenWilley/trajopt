@@ -37,7 +37,7 @@ enum TermType {
     TermInfoPtr out(new classname());\
     return out;\
   }
-  
+
 
 /**
  * Holds all the data for a trajectory optimization problem
@@ -123,7 +123,7 @@ struct TRAJOPT_API TermInfo  {
   TermType term_type;
   virtual void fromJson(const Json::Value& v)=0;
   virtual void hatch(TrajOptProb& prob) = 0;
-  
+
 
   static TermInfoPtr fromName(const string& type);
 
@@ -255,6 +255,22 @@ struct CollisionCostInfo : public TermInfo, public MakesCost {
   void hatch(TrajOptProb& prob);
   DEFINE_CREATE(CollisionCostInfo)
 };
+
+struct CollisionConstraintInfo : public TermInfo, public MakesConstraint {
+  /// first_step and last_step are inclusive
+  int first_step, last_step;
+  /// coeffs.size() = num_timesteps
+  DblVec coeffs;
+  /// safety margin: contacts with distance < dist_pen are penalized
+  DblVec dist_pen;
+  bool continuous;
+  /// for continuous-time penalty, use swept-shape between timesteps t and t+gap (gap=1 by default)
+  int gap;
+  void fromJson(const Value& v);
+  void hatch(TrajOptProb& prob);
+  DEFINE_CREATE(CollisionConstraintInfo)
+};
+
 
 
 // TODO: unify with joint position constraint

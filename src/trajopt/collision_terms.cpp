@@ -39,13 +39,13 @@ void CollisionsToDistanceExpressions(const vector<Collision>& collisions, Config
   exprs.clear();
   exprs.reserve(collisions.size());
   rad.SetDOFValues(dofvals); // since we'll be calculating jacobians
-  std::cout << std::endl << std::endl;
-  std::cout << vars[0].var_rep->name << "Configuration: ";
-  for (int i = 0; i < dofvals.size(); i++) 
-  {
-    std::cout << dofvals[i] << ",";
-  }
-  std::cout << std::endl;
+  //std::cout << std::endl << std::endl;
+  //std::cout << vars[0].var_rep->name << "Configuration: ";
+  //for (int i = 0; i < dofvals.size(); i++)
+  //{
+  //  std::cout << dofvals[i] << ",";
+  //}
+  //std::cout << std::endl;
   for (const Collision& col : collisions) {
     AffExpr dist(col.distance);
     Link2Int::const_iterator itA = link2ind.find(col.linkA);
