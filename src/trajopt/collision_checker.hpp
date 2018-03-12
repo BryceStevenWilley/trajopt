@@ -20,7 +20,7 @@ struct Collision {
   const OR::KinBody::Link* linkA;
   const OR::KinBody::Link* linkB;
   OR::Vector ptA, ptB, normalB2A; /* normal points from 2 to 1 */
-  OR::Vector ptB1;
+  OR::Vector ptB1; /* For CastCollision checker, it's the point on B (moving object) at time 1 (end time?) */
   double distance; /* pt1 = pt2 + normal*dist */
   float weight, time;
   CastCollisionType cctype;
