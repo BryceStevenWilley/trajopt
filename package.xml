@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>trajopt</name>
+  <version>1.0.0</version>
+  <description>Trajectory Optimization.</description>
+  <maintainer email="bsw2@rice.edu">Bryce Willey</maintainer>
+  <license>BSD</license>
+
+  <author>John Schulman</author>
+
+  <buildtool_depend>cmake</buildtool_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>cmake</build_depend>
+  <build_depend>boost</build_depend>
+  <build_depend>eigen</build_depend>
+
+  <run_depend>boost</run_depend>
+  <run_depend>eigen</run_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
+

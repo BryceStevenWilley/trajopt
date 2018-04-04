@@ -34,4 +34,4 @@ include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
 boost_python_module(ctrajoptpy trajoptpy.cpp)
 target_link_libraries(ctrajoptpy trajopt ${Boost_SYSTEM_LIBRARY} )
 
-
+install(TARGETS trajopt LIBRARY DESTINATION ${CMAKE_BINARY_DIR})

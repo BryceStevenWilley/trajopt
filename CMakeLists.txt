@@ -3,6 +3,7 @@ project(trajopt)
 
 add_compile_options(-std=c++11)
 
+# Sets the current source dir to be the actual project, not just
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 option(DEVEL_MODE "build with compiler more errors" OFF)
